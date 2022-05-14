@@ -5,18 +5,43 @@ import styles from '../styles/Home.module.css'
 
 export default function Home() {
   
-  const reducer= (state, action) =>{
-    switch (action.type){
-      case 'INCREMENT' : 
-      return { count: state.count +1 }
-      case 'DECREMENT' : 
-      return { count: state.count -1 }
-      default:
-        return null
-    }
+  // const reducer= (state, action) =>{
+  //   switch (action.type){
+  //     case 'INCREMENT' : 
+  //     return { count: state.count +1 }
+  //     case 'DECREMENT' : 
+  //     return { count: state.count -1 }
+  //     default:
+  //       return null
+  //   }
+  // }
+  // const [state, dispatch] = useReducer(reducer, {count: 0})
+
+  function reducer(state, action){
+      switch (action.type){
+        case 'ADD_PATIENT' :
+          const newPatient = {
+            id: action.id,
+            name: action.name,
+          }
+
+          return { patient : [...state.patient, newPatient] }
+      }
   }
-  const [state, dispatch] = useReducer(reducer, {count: 0})
-  
+  const initialPatient= {
+    patient: []
+  }
+  const [state, dispatch] = useReducer(reducer, initialPatient);
+
+
+  const userRef = useRef();
+
+  function handleSubmit(e){
+    e.preventDefault();
+    dispatch({type: 'ADD_PATIENT', name: userRef.current.value, id: state.patient.length + 1})
+    userRef.current.value = ''
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -30,12 +55,18 @@ export default function Home() {
           <h2>Count : {state.count}</h2>
         </div>
         <div style={{display: 'flex'}}>
-          <button onClick={()=> dispatch({type: 'INCREMENT'})}>+</button>
-          <button onClick={()=> dispatch({type: 'DECREMENT'})}>-</button>
+          {/* <button onClick={()=> dispatch({type: 'INCREMENT'})}>+</button>
+          <button onClick={()=> dispatch({type: 'DECREMENT'})}>-</button> */}
         </div>
        <br />
        <h1>Add Patient</h1>
-     
+        <form onSubmit={handleSubmit}>
+          <input type="text" ref={userRef} />
+        </form>
+        <h2>Total Patient : </h2>
+        <ul>
+          {state.patient.map(data => <li key={data.id}>{data.name}</li>)}
+        </ul>
       </main>
     </div>
   )
