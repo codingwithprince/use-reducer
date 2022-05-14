@@ -4,44 +4,33 @@ import { useReducer, useState, useRef } from 'react'
 import styles from '../styles/Home.module.css'
 
 export default function Home() {
-  
-  // const reducer= (state, action) =>{
-  //   switch (action.type){
-  //     case 'INCREMENT' : 
-  //     return { count: state.count +1 }
-  //     case 'DECREMENT' : 
-  //     return { count: state.count -1 }
-  //     default:
-  //       return null
-  //   }
-  // }
-  // const [state, dispatch] = useReducer(reducer, {count: 0})
-
+  const patientRef = useRef();
+  const [state, dispatch] = useReducer(reducer, { patient: [] })
   function reducer(state, action){
-      switch (action.type){
-        case 'ADD_PATIENT' :
-          const newPatient = {
-            id: action.id,
-            name: action.name,
-          }
-
-          return { patient : [...state.patient, newPatient] }
-      }
+    switch (action.type){
+      case 'ADD_PATIENT':
+        const newPatient = {
+          id: action.id,
+          name: action.name,
+        }
+        return {
+          patient : [ ...state.patient, newPatient ]
+        }
+        case 'REMOVE_PATIENT':
+          const remaining = state.patient.filter(patient => patient.id != action.id);
+        return {
+          patient : remaining
+        }
+    }
   }
-  const initialPatient= {
-    patient: []
-  }
-  const [state, dispatch] = useReducer(reducer, initialPatient);
 
-
-  const userRef = useRef();
-
-  function handleSubmit(e){
+  const handleSubmit = (e) =>{
     e.preventDefault();
-    dispatch({type: 'ADD_PATIENT', name: userRef.current.value, id: state.patient.length + 1})
-    userRef.current.value = ''
+    dispatch({type: 'ADD_PATIENT', name: patientRef.current.value, id: state.patient.length + 1})
+    patientRef.current.value = ''
   }
 
+  
   return (
     <div className={styles.container}>
       <Head>
@@ -50,22 +39,24 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <h1>Counter with useReducer</h1>
+        {/* <h1>Counter with useReducer</h1>
         <div>
           <h2>Count : {state.count}</h2>
         </div>
         <div style={{display: 'flex'}}>
-          {/* <button onClick={()=> dispatch({type: 'INCREMENT'})}>+</button>
-          <button onClick={()=> dispatch({type: 'DECREMENT'})}>-</button> */}
-        </div>
+          <button onClick={()=> dispatch({type: 'INCREMENT'})}>+</button>
+          <button onClick={()=> dispatch({type: 'DECREMENT'})}>-</button>
+        </div> */}
        <br />
        <h1>Add Patient</h1>
         <form onSubmit={handleSubmit}>
-          <input type="text" ref={userRef} />
+          <input style={{borderRadius: '5px', borderColor: 'green'}} type="text" ref={patientRef} />
         </form>
-        <h2>Total Patient : </h2>
+        <h2>Total Patient : {state.patient.length}</h2>
         <ul>
-          {state.patient.map(data => <li key={data.id}>{data.name}</li>)}
+          {
+              state.patient.map(p => <li onClick={()=> dispatch({type: 'REMOVE_PATIENT', id: p.id})} key={p.id} style={{listStyle:'none'}}>{p.name}</li>)
+          }
         </ul>
       </main>
     </div>
